@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PZB Leuchtmelder: durumlar ve arızalar</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef0f2;--card:#fff;--ink:#1b2430;--mute:#5b6675;--line:#d3d8de;--panel:#2a2f36;--off:#454c56;--offt:#8b94a1;--blue:#1f3fff;--red:#e5262a;--yel:#ffd60a;--wht:#f4f4f4;--warn:#c4161c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181d;--card:#1d232b;--ink:#e8ecf1;--mute:#9aa5b3;--line:#2f3844;--panel:#0d1014;--warn:#ff6b6f}}
+:root[data-theme="dark"]{--bg:#14181d;--card:#1d232b;--ink:#e8ecf1;--mute:#9aa5b3;--line:#2f3844;--panel:#0d1014;--warn:#ff6b6f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Barlow,system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+h1{font:600 2rem/1.1 "Barlow Condensed",Barlow,sans-serif;margin:8px 0 4px}
+h2{font:600 1.4rem/1.2 "Barlow Condensed",Barlow,sans-serif;margin:34px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--ink)}
+.sub{color:var(--mute);margin:0 0 14px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.9rem;color:var(--mute);margin-bottom:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.card{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin:12px 0}
+.card.fault{border-left:6px solid var(--warn)}
+.panel{flex:0 0 auto;background:var(--panel);border-radius:8px;padding:10px;display:grid;grid-template-columns:repeat(3,44px);gap:7px}
+.l{height:40px;border-radius:5px;background:var(--off);color:var(--offt);display:flex;align-items:center;justify-content:center;font:600 .95rem/1 Barlow,sans-serif;text-align:center}
+.l.sm{font-size:.62rem;line-height:1.05}
+.on.b{background:var(--blue);color:#fff}.on.r{background:var(--red);color:#fff}.on.y{background:var(--yel);color:#1b1b1b}.on.w{background:var(--wht);color:#1b1b1b}
+.on{box-shadow:0 0 10px 1px currentColor}
+.blink{animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{background:var(--off);color:var(--offt);box-shadow:none}}
+@media (prefers-reduced-motion:reduce){.blink{animation:none;outline:2px dashed #fff}}
+.txt h3{margin:0 0 4px;font-size:1.05rem}
+.txt p{margin:4px 0}
+.tag{display:inline-block;font-size:.8rem;padding:1px 8px;border-radius:99px;background:var(--line);color:var(--ink);margin-right:6px}
+.no{color:var(--warn);font-weight:600}
+.de{margin:8px 0 0!important;padding:6px 10px;border-left:3px solid var(--blue);background:var(--bg);border-radius:0 6px 6px 0;font-size:.93rem}
+.de b{color:var(--mute);margin-right:4px}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+.scroll{overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;background:var(--card)}
+th{background:var(--bg)}
+.qa{background:var(--card);border:1px solid var(--line);border-radius:10px;margin:10px 0;padding:0}
+.qa summary{cursor:pointer;padding:12px 14px;font-weight:600}
+.qa div{padding:0 14px 12px}
+@media (max-width:520px){.card{flex-direction:column}}
+</style>
+</head>
+<body>
+<main>
+<h1>PZB Leuchtmelder: durumlar ve arızalar</h1>
+<p class="sub">Karttaki her lamba paneli, anlamı yanında. Sıra: açılış, 1000 Hz, hız altı, 500 Hz, 2000 Hz, arızalar. Yanıp sönen lambalar gerçekten yanıp söner. Her kartta basit Almanca özet (DE) var.</p>
+<div class="legend"><span><i style="background:var(--blue)"></i>Mavi: 55 / 70 / 85</span><span><i style="background:var(--wht)"></i>Beyaz: Befehl 40</span><span><i style="background:var(--red)"></i>Kırmızı: 500 Hz</span><span><i style="background:var(--yel)"></i>Sarı: 1000 Hz</span></div>
+
+<div id="app"></div>
+
+<h2>Hız tablosu (sayfa 3)</h2>
+<div class="scroll"><table>
+<tr><th rowspan="2">Tür<br><small>Zugart</small></th><th colspan="2">Normal denetim<br><small>normale Geschwindigkeitsüberwachung</small></th><th colspan="2">Restriktif denetim<br><small>restriktive Geschwindigkeitsüberwachung</small></th><th colspan="2">Umschaltgeschw.<br><small>Umschaltgeschwindigkeit</small></th></tr>
+<tr><th>1000 Hz</th><th>500 Hz</th><th>1000 Hz</th><th>500 Hz</th><th>1000 Hz</th><th>500 Hz</th></tr>
+<tr><td><b>O</b></td><td>165 → 85 km/h, 23 s</td><td>65 → 45 km/h, 153 m</td><td>45 sabit</td><td>45 → 25 km/h, 153 m</td><td>10 sabit</td><td>30 → 10 km/h, 153 m</td></tr>
+<tr><td><b>M</b></td><td>125 → 75 km/h, 29 s</td><td>50 → 35 km/h, 153 m</td><td>45 sabit</td><td>25 sabit</td><td>10 sabit</td><td>10 sabit</td></tr>
+<tr><td><b>U</b></td><td>105 → 55 km/h, 38 s</td><td>40 → 25 km/h, 153 m</td><td>45 sabit</td><td>25 sabit</td><td>10 sabit</td><td>10 sabit</td></tr>
+</table></div>
+<p class="sub">Not: Sayfa 1’de M için “70 km/h in 29 s” yazıyor, bu tablo 75 diyor. Tablo muhtemelen doğru, sınavdan önce hocana sor.</p>
+
+<h2>Arıza sorularına kısa cevaplar</h2>
+<details class="qa"><summary>PZB araç donanımı arızalıysa Tf ne yapar?</summary><div>PZB’yi <b>Störschalter</b> ile kapatır, arızayı <b>BZ’ye</b> bildirir, sinyalle yönetilen trenler için en fazla <b>50 km/h</b>.<p class="de"><b>DE</b>Wie muss der Tf handeln? PZB mit dem Störschalter abschalten, die Störung der BZ melden, höchstens 50 km/h für signalgeführte Züge.</p></div></details>
+<details class="qa"><summary>Seyir sırasında mavi PZB lambası söndü. İlk önlem?</summary><div>En fazla 50 km/h ile devam eder ve Betriebszentrale’ye bildirir.<p class="de"><b>DE</b>Blaue PZB-Lampe erloschen? Weiterfahrt mit höchstens 50 km/h und Meldung an die Betriebszentrale.</p></div></details>
+<details class="qa"><summary>Fahrt gösteren sinyali geçtikten sonra PZB arızasından zorunlu frenleme ile durdu. Fdl nasıl izin verir?</summary><div><b>Befehl 2</b> ile.<p class="de"><b>DE</b>Der Fdl stimmt der Weiterfahrt durch Befehl 2 zu.</p></div></details>
+</main>
+<script>
+// lamps: 55,70,85,Befehl,500,1000   state: 1=on, 2=blink
+const N=['55','70','85','Befehl 40','500 Hz','1000 Hz'],C=['b','b','b','w','r','y'];
+const S=[
+["1. Açılış","Sistem durumu",[
+ {s:[0,0,0,0,0,0],t:"PZB hazır değil",d:"PZB-Fahrzeugeinrichtung nicht betriebsbereit. Hiçbir lamba yanmaz."},
+ {s:[0,0,1,0,0,0],t:"PZB hazır, program O",d:"Mavi 85 yanar: araç donanımı hazır, Überwachungsprogramm “O” seçili."},
+ {s:[0,2,2,0,0,0],t:"Kalkış programı (Vist ≥ 5 km/h)",d:"70 ve 85 birlikte yanıp söner. Restriktif denetim 45 km/h: 1000 Hz’den 700 m sonra başlar, 500 Hz etkisine veya 1000 Hz’den 1250 m’ye kadar sürer.",n:"Befreiung sadece Fahrtbegriff > 30 km/h ve sonraki 550 m’de 500 Hz mıknatıs yoksa."},
+ {s:[0,0,1,0,0,0],t:"Devreye alma ve seyir",d:"Devreye alırken veri girişi istenir. Seyirde: 1000 Hz’den 700 m sonra, Überwachung’dan Befreiung olana veya 1250 m dolana kadar denetim sürer."}
+]],
+["2. 1000 Hz","Sarı lamba: uyarı sinyalinde",[
+ {s:[0,0,1,0,0,1],t:"1000 Hz: normal hız denetimi",d:"Sürekli hız denetimi 700 m sürer. Programa göre: O 85 km/h’e 23 s, M 70/75 km/h’e 29 s, U 55 km/h’e 38 s.",n:"Bu aşamada Befreiung mümkün değil."},
+ {s:[0,2,2,0,0,1],t:"1000 Hz + hız 10 km/h altına düştü",d:"Umschaltgeschwindigkeit (10 km/h) altında 15 s kalınca restriktif 45 km/h denetime geçilir. Bitiş: 700 m sonra Befreiung (Fahrtbegriff > 30, 500 Hz yok), 500 Hz mıknatısta 25 km/h, ya da 1000 Hz’den 1250 m."},
+ {s:[0,2,2,0,0,0],t:"700 m sonrası, restriktif 45 km/h",d:"Bu lamba görüntüsü 1000 Hz’den 700 m sonra, 45 km/h restriktif denetimde görülür. Bitiş: Befreiung (Fahrtbegriff > 30), 500 Hz mıknatıs (25 km/h) veya 1250 m dolması."}
+]],
+["3. 500 Hz","Kırmızı lamba: sinyale yaklaşma",[
+ {s:[0,0,1,0,1,0],t:"500 Hz etkisi",d:"Programa göre denetim sürer. 153 m sonra Vmax: O 45, M 35, U 25 km/h.",n:"Befreiung yok."},
+ {s:[0,2,2,0,1,0],t:"500 Hz + hız 10 km/h altına düştü",d:"15 s sonra denetim 25 km/h restriktife iner, programa uygun. 500 Hz yanarken 1000 Hz lambası sönük kalır.",n:"Befreiung yok."}
+]],
+["4. 2000 Hz","Dur sinyali",[
+ {s:[0,0,1,1,0,0],t:"Befehl 40 ile geçiş",d:"Dur gösteren sinyalin izinli geçişi: 2000 Hz etkisinde Befehl 40 düğmesine etkili basılınca Befehl lambası yanar.",x:1},
+ {s:[0,0,0,0,2,2],t:"2000 Hz: zorunlu frenleme",d:"Kırmızı 500 ve sarı 1000 aynı ritimde yanıp söner, sesli uyarı çalar. Zwangsbremse çözülene kadar tren frenlenir.",f:1}
+]],
+["5. Arızalar","Störungsmeldungen",[
+ {s:[0,0,1,0,0,2],t:"Störungssammelmeldung",d:"1000 Hz 10 s yanıp söner, sesli uyarı verir. PZB bazen devam edebilir. Önlemi arıza göstergesinden çıkar.",f:1},
+ {s:[0,0,0,0,0,2],t:"Störbetrieb: PZB kapalı",d:"Otomatik Störbetrieb veya Störschalter basıldı. Denetim 50 km/h’e göre, elektronik kayıt çalışmaya devam eder. Nedenler: arıza, HL basıncı < 3,0 bar, PZB hava musluğu kapalı.",f:1}
+]]
+];
+const G=["Die PZB ist nicht betriebsbereit. Alle Lampen sind aus.","Die PZB ist betriebsbereit. Programm O ist eingestellt (blaue 85 leuchtet).","Startprogramm: Beim Anfahren (ab 5 km/h) gilt zuerst eine strenge Überwachung mit 45 km/h. Befreiung nur bei Fahrtbegriff, mehr als 30 km/h und ohne 500-Hz-Magnet in den nächsten 550 m.","Beim Einschalten: Daten eingeben. Während der Fahrt: Nach 700 m ab dem 1000-Hz-Magnet wird weiter überwacht, bis zur Befreiung oder bis 1250 m vorbei sind.","1000 Hz (Vorsignal): Die Überwachung beginnt. Du musst in der vorgegebenen Zeit langsamer werden: O 85 km/h in 23 s, M 70/75 km/h in 29 s, U 55 km/h in 38 s. Keine Befreiung möglich.","Fährst du länger als 15 s langsamer als 10 km/h, wechselt die PZB auf die strenge 45-km/h-Überwachung. Ende: Befreiung nach 700 m, 500-Hz-Magnet (dann 25 km/h) oder 1250 m nach dem 1000-Hz-Magnet.","Strenge Überwachung mit 45 km/h nach 700 m. Sie endet durch Befreiung (Fahrtbegriff, über 30 km/h), durch den 500-Hz-Magnet (25 km/h) oder nach 1250 m.","500 Hz (kurz vor dem Hauptsignal): Überwachung nach Programm. Keine Befreiung. Nach 153 m gilt: O 45, M 35, U 25 km/h.","Unter 10 km/h für 15 s: Die Überwachung wird streng, 25 km/h. Die 1000-Hz-Lampe bleibt dunkel, solange 500 Hz leuchtet. Keine Befreiung.","Erlaubte Vorbeifahrt am Halt zeigenden Signal: ab 2000-Hz-Magnet und mit wirksamer Befehlstaste. Die Lampe Befehl 40 leuchtet.","Zwangsbremsung nach 2000 Hz: Der Zug wird automatisch gebremst, bis die Zwangsbremsung gelöst ist. Rote und gelbe Lampe blinken im gleichen Takt, dazu ertönt ein Signal.","Sammelstörung: Die 1000-Hz-Lampe blinkt 10 s mit Signalton. PZB-Betrieb ist oft weiter möglich. Maßnahmen aus der Störungsanzeige ableiten.","PZB-Störbetrieb: PZB ausgeschaltet (automatisch oder per Störschalter). Überwacht wird nur noch mit 50 km/h. Ursachen: Störung, Hauptluftleitung unter 3,0 bar, Luftabsperrhahn geschlossen."];let k=0;
+const app=document.getElementById('app');
+S.forEach(([h,sub,cards])=>{
+ const e=document.createElement('section');
+ e.innerHTML='<h2>'+h+' <span style="font-weight:400;color:var(--mute);font-size:1rem">· '+sub+'</span></h2>';
+ cards.forEach(c=>{
+  const d=document.createElement('div');d.className='card'+(c.f?' fault':'');
+  let p='<div class="panel">';
+  c.s.forEach((v,i)=>{p+='<div class="l'+(i>2?' sm':'')+(v?' on '+C[i]:'')+(v==2?' blink':'')+'">'+N[i].replace(' ','<br>')+'</div>'});
+  p+='</div>';
+  d.innerHTML=p+'<div class="txt"><h3>'+c.t+'</h3><p>'+c.d+'</p>'+(c.n?'<p class="no">'+c.n+'</p>':'')+'<p class="de"><b>DE</b>'+G[k++]+'</p></div>';
+  e.appendChild(d);
+ });
+ app.appendChild(e);
+});
+</script>
+</body>
+</html>
